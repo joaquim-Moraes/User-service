@@ -1,8 +1,10 @@
 package com.example.user_service.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.user_service.Entity.Usuario;
+import com.example.user_service.Security.JwtUtil; // Importado
 import com.example.user_service.Service.UsuarioService;
 
 @RestController
@@ -22,6 +25,10 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    // 1. INJETA o JwtUtil (bean)
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @PostMapping("/cadastro")
     public Usuario cadastrarUsuario(@RequestBody Usuario usuario){
@@ -58,9 +65,14 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public Usuario login(@RequestBody Usuario loginData) {
-        return usuarioService.autenticarUsuario(loginData.getCpfUsuario(), loginData.getSenhaUsuario());
+    public ResponseEntity<?> login(@RequestBody Usuario loginData) {
+        Usuario usuario = usuarioService.autenticarUsuario(loginData.getCpfUsuario(), loginData.getSenhaUsuario());
+        
+        String token = jwtUtil.generateToken(usuario.getIdUsuario());
+
+        return ResponseEntity.ok().body(Map.of(
+                "token", token,
+                "usuario", usuario
+        ));
     }
-
-
 }
