@@ -34,6 +34,15 @@ public class UsuarioController {
     public Usuario cadastrarUsuario(@RequestBody Usuario usuario){
         return usuarioService.cadastrarUsuario(usuario);
     }
+    @PostMapping("/verificar")
+    public ResponseEntity<?> verificarConta(@RequestParam String codigo) {
+        try {
+            usuarioService.verificarUsuarioPeloCodigo(codigo);
+            return ResponseEntity.ok().body(Map.of("message", "Conta verificada!"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 
     @GetMapping("/listagem")
     public List<Usuario> listarTodosUsuarios(){
@@ -42,7 +51,7 @@ public class UsuarioController {
 
 
     @GetMapping("/buscar")
-    public Usuario filtrarPorId(@RequestParam int id) {
+    public Usuario filtrarPorId(@PathVariable int id) {
         return usuarioService.buscarPorId(id);
     }
 

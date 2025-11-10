@@ -1,5 +1,7 @@
 package com.example.user_service.Entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,6 +35,14 @@ public class Usuario {
     @Column(name = "cpf_usuario",nullable = false,unique = true)
     private String cpfUsuario;
 
+    @Column(name = "ativo", nullable = false)
+    private boolean ativo = false;
+
+    @Column(name = "verification_code", nullable = true)
+    private String verificationCode;
+
+    @Column(name = "code_expiry_date", nullable = true)
+    private LocalDateTime codeExpiryDate;
 
     public void setSenhaUsuario(String senhaUsuario) {
         this.senhaUsuario = senhaUsuario;
