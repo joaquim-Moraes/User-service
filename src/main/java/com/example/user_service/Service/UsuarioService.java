@@ -58,11 +58,11 @@ public class UsuarioService{
        usuarioRepository.save(usuario);
     }
 
-    public void deletarUsuario(int id){
+    public void deletarUsuario(Long id){
         usuarioRepository.deleteById(id);
     }
 
-    public Usuario buscarPorId(int id) {
+    public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario não encontrado."));
     }

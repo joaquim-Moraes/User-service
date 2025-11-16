@@ -26,7 +26,7 @@ public class JwtUtil {
     }
 
     // 4. O método agora NÃO é mais 'static'
-    public String generateToken(int userId) {
+    public String generateToken(Long userId) {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .setIssuedAt(new Date())

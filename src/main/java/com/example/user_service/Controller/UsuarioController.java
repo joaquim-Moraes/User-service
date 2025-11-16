@@ -51,18 +51,18 @@ public class UsuarioController {
 
 
     @GetMapping("/buscar")
-    public Usuario filtrarPorId(@PathVariable int id) {
+    public Usuario filtrarPorId(@PathVariable Long id) {
         return usuarioService.buscarPorId(id);
     }
 
 
     @DeleteMapping("/{id}")
-    public void deletarUsuario(@PathVariable int id) {
+    public void deletarUsuario(@PathVariable Long id) {
         usuarioService.deletarUsuario(id);
     }
 
     @PutMapping("/{id}")
-    public Usuario atualizarUsuario(@PathVariable int id, @RequestBody Usuario dadosAtualizados) {
+    public Usuario atualizarUsuario(@PathVariable Long id, @RequestBody Usuario dadosAtualizados) {
         Usuario usuarioExistente = usuarioService.buscarPorId(id);
         usuarioService.atualizarUsuario(
                 usuarioExistente,
