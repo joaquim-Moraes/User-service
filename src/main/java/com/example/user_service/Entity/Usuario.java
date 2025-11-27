@@ -43,6 +43,12 @@ public class Usuario {
 
     @Column(name = "code_expiry_date", nullable = true)
     private LocalDateTime codeExpiryDate;
+    
+    @Column(name = "password_reset_token", nullable = true)
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_expiry", nullable = true)
+    private LocalDateTime passwordResetExpiry;
 
     public void setSenhaUsuario(String senhaUsuario) {
         this.senhaUsuario = senhaUsuario;

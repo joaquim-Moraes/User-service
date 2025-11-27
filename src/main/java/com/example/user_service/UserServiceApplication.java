@@ -16,12 +16,15 @@ public class UserServiceApplication {
 		System.setProperty("SENDGRID_API_KEY", dotenv.get("SENDGRID_API_KEY"));
 		System.setProperty("SENDGRID_FROM_EMAIL", dotenv.get("SENDGRID_FROM_EMAIL"));
 		System.setProperty("SENDGRID_TEMPLATE_ID", dotenv.get("SENDGRID_TEMPLATE_ID"));
+		System.setProperty("SENDGRID_SENHA_TEMPLATE_ID", dotenv.get("SENDGRID_SENHA_TEMPLATE_ID"));
 		// Puxando as variaveis do env
 		System.setProperty("DB_URL", dotenv.get("DB_URL"));
 		System.setProperty("DB_USER", dotenv.get("DB_USER"));
 		System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
 		// Puxando a chave secret
 		System.setProperty("JWT_SECRET", dotenv.get("JWT_SECRET"));
+
+		System.setProperty("APP_FRONTEND_URL", dotenv.get("APP_FRONTEND_URL"));
 
 		
 		SpringApplication.run(UserServiceApplication.class, args);

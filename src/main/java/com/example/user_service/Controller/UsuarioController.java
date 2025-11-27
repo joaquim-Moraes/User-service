@@ -44,6 +44,29 @@ public class UsuarioController {
         }
     }
 
+    @PostMapping("/solicitar-reset")
+    public ResponseEntity<?> solicitarResetSenha(@RequestParam String email) {
+        try {
+            usuarioService.iniciarResetSenha(email);
+            return ResponseEntity.ok().body(Map.of("message", "E-mail de reset enviado se o e-mail estiver cadastrado."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/resetar-senha")
+    public ResponseEntity<?> resetarSenha(@RequestParam String token, @RequestBody Map<String, String> body) {
+        try {
+            String novaSenha = body.get("novaSenha");
+            usuarioService.resetarSenha(token, novaSenha);
+            return ResponseEntity.ok().body(Map.of("message", "Senha alterada com sucesso."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    
+
     @GetMapping("/listagem")
     public List<Usuario> listarTodosUsuarios(){
         return usuarioService.listarUsuarios();

@@ -1,18 +1,18 @@
 package com.example.user_service.Service;
 
 
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.sendgrid.Request;
 import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
 import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
-import com.sendgrid.Response;
-
-import java.io.IOException;
-import org.springframework.beans.factory.annotation.Value;
 @Service
 public class EmailService {
     
@@ -24,6 +24,11 @@ public class EmailService {
 
     @Value("${sendgrid.template.id}")
     private String templateId;
+    @Value("${sendgrid.senha.template.id}")
+    private String senhaTemplateId;
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     public void sendVerificationEmail(String toEmail, String token){
         Mail mail = new Mail();
@@ -63,5 +68,81 @@ public class EmailService {
             throw new RuntimeException("Erro de conexão ao enviar e-mail", ex);
         }
     }
+    public void sendSenhaEmail(String toEmail, String senha){
+        Mail mail = new Mail();
+        mail.setFrom(new Email(fromEmail));
+        mail.setTemplateId(senhaTemplateId);
+        
+        Personalization personalization = new Personalization();
+        personalization.addTo(new Email(toEmail));
+        
+
+        personalization.addDynamicTemplateData("novaSenha", senha);
+        
+        mail.addPersonalization(personalization);
+
+        SendGrid sg = new SendGrid(sendGridApiKey);
+        Request request = new Request();
+        try{
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+
+            Response response = sg.api(request);
+
+                    System.out.println("E-mail enviado para " + toEmail + ". Status Code: " + response.getStatusCode());
+
+            // Se o SendGrid retornar um erro (ex: 401, 403), lança uma exceção
+            if (response.getStatusCode() >= 400) {
+                System.err.println("Erro do SendGrid: " + response.getBody());
+                throw new RuntimeException("Erro ao enviar e-mail: " + response.getBody());
+            }
+        
+
+        } catch (IOException ex) {
+            // Erro de rede/conexão
+            System.err.println("Erro de IO ao enviar e-mail: " + ex.getMessage());
+            throw new RuntimeException("Erro de conexão ao enviar e-mail", ex);
+    
     }
+}
+
+    public void sendPasswordResetEmail(String toEmail, String token){
+        Mail mail = new Mail();
+        mail.setFrom(new Email(fromEmail));
+        mail.setTemplateId(senhaTemplateId);
+        
+        Personalization personalization = new Personalization();
+        personalization.addTo(new Email(toEmail));
+
+        String resetLink = frontendUrl + "/reset-password?token=" + token;
+
+        personalization.addDynamicTemplateData("resetLink", resetLink);
+        
+        mail.addPersonalization(personalization);
+
+        SendGrid sg = new SendGrid(sendGridApiKey);
+        Request request = new Request();
+        try{
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+
+            Response response = sg.api(request);
+
+            System.out.println("E-mail de reset enviado para " + toEmail + ". Status Code: " + response.getStatusCode());
+
+            if (response.getStatusCode() >= 400) {
+                System.err.println("Erro do SendGrid: " + response.getBody());
+                throw new RuntimeException("Erro ao enviar e-mail: " + response.getBody());
+            }
+
+
+        } catch (IOException ex) {
+            System.err.println("Erro de IO ao enviar e-mail: " + ex.getMessage());
+            throw new RuntimeException("Erro de conexão ao enviar e-mail", ex);
+        }
+    }
+    }
+
 

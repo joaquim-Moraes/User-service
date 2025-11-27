@@ -3,6 +3,7 @@ package com.example.user_service.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,6 +22,7 @@ public class UsuarioService{
 
     @Autowired
     private EmailService emailService;
+
 
     // Cadastro do cliente
     @Transactional
@@ -107,6 +109,43 @@ public void verificarUsuarioPeloCodigo(String codigo) {
         usuario.setCodeExpiryDate(null);  
         usuarioRepository.save(usuario);
 }
+
+    // Inicia processo de reset de senha: gera token, salva no usuário e envia e-mail
+    public void iniciarResetSenha(String email) {
+        Usuario usuario = usuarioRepository.findByEmailUsuario(email)
+                .orElseThrow(() -> new IllegalArgumentException("Email não cadastrado."));
+
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expiry = LocalDateTime.now().plusMinutes(30);
+
+        usuario.setPasswordResetToken(token);
+        usuario.setPasswordResetExpiry(expiry);
+        usuarioRepository.save(usuario);
+
+        emailService.sendPasswordResetEmail(usuario.getEmailUsuario(), token);
+    }
+
+    // Reseta a senha usando o token enviado por e-mail
+    public void resetarSenha(String token, String novaSenha) {
+        Usuario usuario = usuarioRepository.findByPasswordResetToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Token inválido."));
+
+        if (usuario.getPasswordResetExpiry() == null || LocalDateTime.now().isAfter(usuario.getPasswordResetExpiry())) {
+            usuario.setPasswordResetToken(null);
+            usuario.setPasswordResetExpiry(null);
+            usuarioRepository.save(usuario);
+            throw new IllegalArgumentException("Token expirado. Solicite um novo reset.");
+        }
+
+        validarSenha(novaSenha);
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        usuario.setSenhaUsuario(encoder.encode(novaSenha));
+
+        usuario.setPasswordResetToken(null);
+        usuario.setPasswordResetExpiry(null);
+        usuarioRepository.save(usuario);
+    }
 
     private void validarEmail(String email) {
         if (email == null || !email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {

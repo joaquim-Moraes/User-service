@@ -15,5 +15,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario,Long> {
     Optional<Usuario> findByIdUsuario(Long id);
     Optional<Usuario> findByCpfUsuario(String cpf);
     Optional<Usuario> findByVerificationCode(String token);
+    Optional<Usuario> findByPasswordResetToken(String token);
 
 }
