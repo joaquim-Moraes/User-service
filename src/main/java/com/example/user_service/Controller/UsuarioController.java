@@ -54,7 +54,7 @@ public class UsuarioController {
         }
     }
 
-    @PostMapping("/resetar-senha")
+    @PostMapping("/reset")
     public ResponseEntity<?> resetarSenha(@RequestParam String token, @RequestBody Map<String, String> body) {
         try {
             String novaSenha = body.get("novaSenha");
